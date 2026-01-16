@@ -32,9 +32,9 @@ class DataSource(ABC):
         Yields:
             EconomicIndicator objects as they are fetched.
         """
-        # Default implementation yields nothing
-        return
-        yield  # Make this a generator
+        # Default implementation yields nothing - this is a no-op async generator
+        if False:  # pragma: no cover
+            yield
 
     async def close(self) -> None:
         """Clean up any resources.

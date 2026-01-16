@@ -103,7 +103,6 @@ class TestBriefingStorage:
     @pytest.mark.asyncio
     async def test_is_duplicate_true(self, storage, sample_briefing):
         """Test duplicate detection when duplicate exists."""
-        sample_briefing.sent = True
         await storage.save_briefing(sample_briefing)
         await storage.mark_briefing_sent(sample_briefing.id)
 

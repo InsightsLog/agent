@@ -53,6 +53,7 @@ macro-agent = "macroeconomic_agent.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+namespaces = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
