@@ -1,8 +1,9 @@
 """Configuration settings for the Macroeconomic News Release Analyst Agent."""
 
 from typing import Optional
-from pydantic_settings import BaseSettings
+
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -49,6 +50,9 @@ class Settings(BaseSettings):
     )
     economic_calendar_api_key: Optional[str] = Field(
         default=None, description="API key for economic calendar"
+    )
+    alpha_vantage_api_key: Optional[str] = Field(
+        default=None, description="API key for Alpha Vantage economic data"
     )
 
     class Config:
