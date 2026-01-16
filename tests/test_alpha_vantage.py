@@ -1,8 +1,8 @@
 """Tests for the Alpha Vantage data source."""
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch, MagicMock
 
 from src.macroeconomic_agent.data_sources.alpha_vantage import AlphaVantageSource
 from src.macroeconomic_agent.models import ImpactLevel

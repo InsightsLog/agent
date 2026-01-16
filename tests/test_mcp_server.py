@@ -1,8 +1,9 @@
 """Tests for the MCP server module."""
 
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
 from datetime import datetime, timezone
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from src.macroeconomic_agent.mcp.server import EconomicCalendarMCP, create_mcp_server
 from src.macroeconomic_agent.models import EconomicIndicator, ImpactLevel
@@ -52,7 +53,11 @@ class TestEconomicCalendarMCP:
             previous_value="3.4%",
         )
 
-        with patch.object(mcp._get_source(), "fetch_economic_indicator", return_value=mock_indicator):
+        # Create a mock source
+        mock_source = MagicMock()
+        mock_source.fetch_economic_indicator = AsyncMock(return_value=mock_indicator)
+
+        with patch.object(mcp, "_get_source", return_value=mock_source):
             result = await mcp.get_economic_indicator("CPI")
 
             assert "error" not in result
@@ -67,7 +72,11 @@ class TestEconomicCalendarMCP:
         """Test indicator retrieval failure returns error."""
         mcp = EconomicCalendarMCP(api_key="test_key")
 
-        with patch.object(mcp._get_source(), "fetch_economic_indicator", return_value=None):
+        # Create a mock source that returns None
+        mock_source = MagicMock()
+        mock_source.fetch_economic_indicator = AsyncMock(return_value=None)
+
+        with patch.object(mcp, "_get_source", return_value=mock_source):
             result = await mcp.get_economic_indicator("INVALID")
 
             assert "error" in result
@@ -104,10 +113,12 @@ class TestEconomicCalendarMCP:
             actual_value="100",
         )
 
-        async def mock_fetch(code):
-            return mock_indicator
+        # Create a mock source
+        mock_source = MagicMock()
+        mock_source.fetch_economic_indicator = AsyncMock(return_value=mock_indicator)
+        mock_source.get_available_indicators = MagicMock(return_value=["CPI", "REAL_GDP"])
 
-        with patch.object(mcp._get_source(), "fetch_economic_indicator", side_effect=mock_fetch):
+        with patch.object(mcp, "_get_source", return_value=mock_source):
             result = await mcp.get_economic_calendar()
 
             assert "calendar" in result
@@ -128,7 +139,11 @@ class TestEconomicCalendarMCP:
             actual_value="3.1%",
         )
 
-        with patch.object(mcp._get_source(), "fetch_economic_indicator", return_value=mock_indicator):
+        # Create a mock source
+        mock_source = MagicMock()
+        mock_source.fetch_economic_indicator = AsyncMock(return_value=mock_indicator)
+
+        with patch.object(mcp, "_get_source", return_value=mock_source):
             result = await mcp.get_economic_calendar(["cpi", "real_gdp"])
 
             assert "calendar" in result
@@ -148,7 +163,16 @@ class TestEconomicCalendarMCP:
             actual_value="100",
         )
 
-        with patch.object(mcp._get_source(), "fetch_economic_indicator", return_value=mock_indicator):
+        # Create a mock source with INDICATORS attribute
+        mock_source = MagicMock()
+        mock_source.fetch_economic_indicator = AsyncMock(return_value=mock_indicator)
+        mock_source.INDICATORS = {
+            "CPI": {"impact": ImpactLevel.HIGH},
+            "REAL_GDP": {"impact": ImpactLevel.HIGH},
+            "TREASURY_YIELD": {"impact": ImpactLevel.MEDIUM},
+        }
+
+        with patch.object(mcp, "_get_source", return_value=mock_source):
             result = await mcp.get_high_impact_indicators()
 
             assert "calendar" in result
